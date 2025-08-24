@@ -1,6 +1,7 @@
 package dev.artisra.studysessionservice.controllers;
 
 import dev.artisra.studysessionservice.models.dto.ActiveStudySession;
+import dev.artisra.studysessionservice.models.dto.CommandRequest;
 import dev.artisra.studysessionservice.models.dto.StudySessionRequest;
 import dev.artisra.studysessionservice.services.interfaces.StudySessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("api/sessions")
@@ -28,44 +31,21 @@ public class StudyServiceController {
                 .body(newId);
     }
 
-    @PostMapping("/{sessionId}/start")
-    public ResponseEntity<Void> startStudySession(@PathVariable long sessionId) {
-        studySessionService.startStudySession(sessionId);
-        return ResponseEntity.accepted().build();
-    }
+    @PostMapping("/{sessionId}/command")
+    public ResponseEntity<Void> sendCommand(@PathVariable long sessionId, @RequestBody CommandRequest command) {
+        if (!studySessionService.exists(sessionId)) {
+            return ResponseEntity.notFound().build();
+        }
 
-    @PostMapping("/{sessionId}/pause")
-    public ResponseEntity<Void> pauseStudySession(@PathVariable long sessionId) {
-        studySessionService.pauseStudySession(sessionId);
-        return ResponseEntity.accepted().build();
-    }
-
-    @PostMapping("/{sessionId}/resume")
-    public ResponseEntity<Void> resumeStudySession(@PathVariable long sessionId) {
-        studySessionService.resumeStudySession(sessionId);
-        return ResponseEntity.accepted().build();
-    }
-
-    @PostMapping("/{sessionId}/complete")
-    public ResponseEntity<Void> completeStudySession(@PathVariable long sessionId) {
-        studySessionService.completeStudySession(sessionId);
-        return ResponseEntity.accepted().build();
-    }
-
-    @PostMapping("/{sessionId}/cancel")
-    public ResponseEntity<Void> cancelStudySession(@PathVariable long sessionId) {
-        studySessionService.cancelStudySession(sessionId);
-        return ResponseEntity.accepted().build();
-    }
-
-    @PostMapping("/{sessionId}/delete")
-    public ResponseEntity<Void> deleteStudySession(@PathVariable long sessionId) {
-        studySessionService.deleteStudySession(sessionId);
+        studySessionService.sendCommand(sessionId, command);
         return ResponseEntity.accepted().build();
     }
 
     @GetMapping("/{sessionId}")
     public ResponseEntity<ActiveStudySession> getActiveStudySessionById(@PathVariable long sessionId) {
+        if (!studySessionService.exists(sessionId)) {
+            return ResponseEntity.notFound().build();
+        }
         ActiveStudySession activeStudySession = studySessionService.getActiveStudySession(sessionId);
         return ResponseEntity.ok(activeStudySession);
     }
