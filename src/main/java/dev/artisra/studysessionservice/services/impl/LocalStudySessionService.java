@@ -101,7 +101,7 @@ public class LocalStudySessionService implements StudySessionService {
     private void completeStudySession(long sessionId) {
         ActiveStudySession activeStudySession = getActiveStudySession(sessionId);
         StudySessionState state = activeStudySession.getState();
-        if (state == StudySessionState.COMPLETED || state == StudySessionState.CANCELLED) {
+        if (state != StudySessionState.IN_PROGRESS && state != StudySessionState.PAUSED) {
             logger.info("Study session with ID {} cannot be completed. State: {}", sessionId, state);
             return;
         }
@@ -110,7 +110,8 @@ public class LocalStudySessionService implements StudySessionService {
 
     private void cancelStudySession(long sessionId) {
         ActiveStudySession activeStudySession = getActiveStudySession(sessionId);
-        if (activeStudySession.getState() == StudySessionState.CANCELLED) {
+        if (activeStudySession.getState() == StudySessionState.CANCELLED ||
+                activeStudySession.getState() == StudySessionState.COMPLETED) {
             logger.info("Study session with ID {} cannot be cancelled. State: {}", sessionId,
                     activeStudySession.getState());
             return;
