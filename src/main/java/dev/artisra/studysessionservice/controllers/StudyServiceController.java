@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("api/sessions")
@@ -46,7 +44,12 @@ public class StudyServiceController {
         if (!studySessionService.exists(sessionId)) {
             return ResponseEntity.notFound().build();
         }
+
         ActiveStudySession activeStudySession = studySessionService.getActiveStudySession(sessionId);
+
+        if (activeStudySession == null) {
+            return ResponseEntity.notFound().build(); // Handle the null case, in case we bypass the exists check
+        }
         return ResponseEntity.ok(activeStudySession);
     }
 
