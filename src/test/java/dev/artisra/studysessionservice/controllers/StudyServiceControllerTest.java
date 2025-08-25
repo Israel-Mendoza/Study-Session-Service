@@ -4,7 +4,6 @@ import dev.artisra.studysessionservice.models.dto.ActiveStudySession;
 import dev.artisra.studysessionservice.models.enums.StudySessionState;
 import dev.artisra.studysessionservice.services.interfaces.StudySessionService;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,13 +34,12 @@ class StudyServiceControllerTest {
 
         var request = post("/api/sessions/new")
                 .contentType("application/json")
-                .content("{\"subject\":\"Math\",\"topic\":\"Algebra\",\"userId\":1}");
+                .content("{\"subject\":\"Math\",\"topic\":\"Algebra\",\"userId\":\"artisra\"}");
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
     }
 
-    @Disabled
     @Test
     void testCreateStudySession_EmptyData() throws Exception {
         var requestEmptyData = post("/api/sessions/new")
@@ -49,10 +47,27 @@ class StudyServiceControllerTest {
                 .content("{\"subject\":\"\",\"topic\":\"\",\"userId\":\"\"}"); // Assumes validation on the DTO
 
         mockMvc.perform(requestEmptyData)
-                .andExpect(status().isBadRequest());
+                .andExpectAll(result -> {
+                    status().isBadRequest().match(result);
+                    String jsonResponse = result.getResponse().getContentAsString();
+
+                    // Assert that the response contains the timestamp and status fields
+                    assert jsonResponse.contains("timestamp");
+                    assert jsonResponse.contains("status");
+
+                    // Assert that the response contains validation error messages
+                    assert jsonResponse.contains("subject");
+                    assert jsonResponse.contains("topic");
+                    assert jsonResponse.contains("userId");
+
+                    // Assert that the response contains the description field
+                    assert jsonResponse.contains("uri=/api/sessions/new");
+
+                    // Ensure that the service method was never called
+                    verify(studySessionService, never()).createStudySession(any());
+                });
     }
 
-    @Disabled
     @Test
     void testCreateStudySession_MissingFields() throws Exception {
         var requestMissingFields = post("/api/sessions/new")
@@ -60,7 +75,23 @@ class StudyServiceControllerTest {
                 .content("{\"subject\":\"\",\"userId\":\"\"}"); // Missing 'topic'
 
         mockMvc.perform(requestMissingFields)
-                .andExpect(status().isBadRequest());
+                .andExpectAll(result -> {
+                    status().isBadRequest().match(result);
+                    String jsonResponse = result.getResponse().getContentAsString();
+
+                    // Assert that the response contains the timestamp and status fields
+                    assert jsonResponse.contains("timestamp");
+                    assert jsonResponse.contains("status");
+
+                    // Assert that the response contains validation error messages
+                    assert jsonResponse.contains("topic");
+
+                    // Assert that the response contains the description field
+                    assert jsonResponse.contains("uri=/api/sessions/new");
+
+                    // Ensure that the service method was never called
+                    verify(studySessionService, never()).createStudySession(any());
+                });
     }
 
     @Test

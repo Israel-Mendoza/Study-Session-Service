@@ -4,6 +4,8 @@ import dev.artisra.studysessionservice.models.dto.ActiveStudySession;
 import dev.artisra.studysessionservice.models.dto.CommandRequest;
 import dev.artisra.studysessionservice.models.dto.StudySessionRequest;
 import dev.artisra.studysessionservice.services.interfaces.StudySessionService;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +24,7 @@ public class StudyServiceController {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<Long> createStudySession(@RequestBody StudySessionRequest studySessionRequest) {
+    public ResponseEntity<Long> createStudySession(@Valid @RequestBody StudySessionRequest studySessionRequest) {
         long newId = studySessionService.createStudySession(studySessionRequest);
         return ResponseEntity
                 .created(URI.create("/" + newId))
