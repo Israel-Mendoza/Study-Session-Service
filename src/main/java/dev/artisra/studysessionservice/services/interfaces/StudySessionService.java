@@ -1,20 +1,10 @@
 package dev.artisra.studysessionservice.services.interfaces;
 
-import dev.artisra.studysessionservice.models.dto.ActiveStudySession;
 import dev.artisra.studysessionservice.models.dto.CommandRequest;
-import dev.artisra.studysessionservice.models.dto.StudySessionRequest;
-
-import java.util.List;
+import dev.artisra.studysessionservice.models.dto.NewStudySessionRequest;
 
 public interface StudySessionService {
-    long createStudySession(StudySessionRequest studySessionRequest);
+    long createStudySession(NewStudySessionRequest newStudySessionRequest);
 
     void sendCommand(long sessionId, CommandRequest command);
-
-    boolean exists(long sessionId);
-
-    ActiveStudySession getActiveStudySession(long sessionId);
-
-    List<ActiveStudySession> getAllStudySessions();
-
 }

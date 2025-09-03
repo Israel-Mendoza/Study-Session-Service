@@ -2,17 +2,12 @@ package dev.artisra.studysessionservice.models.dto;
 
 import dev.artisra.studysessionservice.models.enums.StudySessionCommand;
 
-public class CommandRequest {
-    private StudySessionCommand command;
+import java.time.Instant;
 
-    public CommandRequest() {
-    }
-
-    public CommandRequest(StudySessionCommand command) {
-        this.command = command;
-    }
-
-    public StudySessionCommand getCommand() {
-        return command;
-    }
+public record CommandRequest(
+        String commandId,                  // for idempotency
+        StudySessionCommand command,
+        String issuedBy,                   // userId or system
+        Instant issuedAt                   // timestamp
+) {
 }
