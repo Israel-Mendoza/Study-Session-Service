@@ -6,10 +6,12 @@ import dev.artisra.studysessionservice.services.interfaces.StudySessionService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
+@Profile("!local")
 public class KafkaStudySessionService implements StudySessionService {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
@@ -23,12 +25,11 @@ public class KafkaStudySessionService implements StudySessionService {
     }
 
     @Override
-    public long createStudySession(NewStudySessionRequest newStudySessionRequest) {
+    public void createStudySession(NewStudySessionRequest newStudySessionRequest) {
         // Generate a unique session ID
         long sessionId = System.currentTimeMillis();
         // Send the study session request to Kafka
         kafkaTemplate.send(studySessionsTopic, String.valueOf(sessionId), newStudySessionRequest.toString());
-        return sessionId;
     }
 
     @Override

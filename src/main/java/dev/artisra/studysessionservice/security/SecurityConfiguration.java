@@ -12,9 +12,10 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("api/sessions", "api/sessions/**").permitAll()
+                        .requestMatchers("api/sessions", "api/sessions/**", "/h2-console", "/h2-console/**").permitAll()
                         .anyRequest().authenticated()
-                );
+                )
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
 
         return http.build();
     }

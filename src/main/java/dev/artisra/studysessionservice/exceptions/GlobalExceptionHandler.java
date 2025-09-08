@@ -39,4 +39,16 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(generalException, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(AlreadyProcessedCommandException.class)
+    public ResponseEntity<GeneralException> handleAlreadyProcessedCommandException(AlreadyProcessedCommandException ex, WebRequest request) {
+        GeneralException generalException = new GeneralException(
+                LocalDateTime.now(),
+                HttpStatus.ALREADY_REPORTED.value(),
+                Map.of("message", ex.getMessage()),
+                request.getDescription(false)
+        );
+
+        return new ResponseEntity<>(generalException, HttpStatus.ALREADY_REPORTED);
+    }
 }

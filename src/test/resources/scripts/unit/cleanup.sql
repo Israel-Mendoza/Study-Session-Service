@@ -1,0 +1,1 @@
+delete from processed_commands;
