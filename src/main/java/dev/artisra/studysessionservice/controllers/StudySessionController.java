@@ -3,8 +3,14 @@ package dev.artisra.studysessionservice.controllers;
 import dev.artisra.studysessionservice.exceptions.AlreadyProcessedCommandException;
 import dev.artisra.studysessionservice.models.dto.CommandRequest;
 import dev.artisra.studysessionservice.models.dto.NewStudySessionRequest;
+import dev.artisra.studysessionservice.models.exceptions.GeneralException;
 import dev.artisra.studysessionservice.services.interfaces.CommandIdService;
 import dev.artisra.studysessionservice.services.interfaces.StudySessionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
@@ -15,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/sessions")
+@Tag(name = "Study Session Service", description = "Endpoints creating study sessions, and manage active ones")
 public class StudySessionController {
 
     private static final Logger logger = LoggerFactory.getLogger(StudySessionController.class);
@@ -27,6 +34,11 @@ public class StudySessionController {
     }
 
     @PostMapping("/")
+    @Operation(summary = "Create a new Study Session",
+            description = "Creates a new study session - Will return 202 for non processed requests")
+    @ApiResponse(responseCode = "202", description = "Study Session creation request successfully processed")
+    @ApiResponse(responseCode = "208", description = "Command ID has already been processed", content =  @Content(schema = @Schema(implementation = GeneralException.class)))
+    @ApiResponse(responseCode = "400", description = "Bad Request", content =  @Content(schema = @Schema(implementation = GeneralException.class)))
     public ResponseEntity<Long> createStudySession(@Valid @RequestBody NewStudySessionRequest newStudySessionRequest) {
         logger.info("Received request to create study session: {}", newStudySessionRequest);
         checkIfCommandIsProcessed(newStudySessionRequest.commandId());
@@ -36,6 +48,11 @@ public class StudySessionController {
     }
 
     @PostMapping("/{sessionId}/commands")
+    @Operation(summary = "Operates existing Study Sessions",
+            description = "Sends commands to downstream services with any available action on an active Study Session")
+    @ApiResponse(responseCode = "202", description = "Command on an active study session was processed successfully")
+    @ApiResponse(responseCode = "208", description = "Command ID has already been processed", content =  @Content(schema = @Schema(implementation = GeneralException.class)))
+    @ApiResponse(responseCode = "400", description = "Bad Request", content =  @Content(schema = @Schema(implementation = GeneralException.class)))
     public ResponseEntity<Void> sendCommand(@PathVariable long sessionId, @Valid @RequestBody CommandRequest command) {
         logger.info("Received command for session ID {}: {}", sessionId, command);
         checkIfCommandIsProcessed(command.id());

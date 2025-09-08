@@ -12,7 +12,18 @@ public class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("api/sessions", "api/sessions/**", "/h2-console", "/h2-console/**").permitAll()
+                        .requestMatchers(
+                                "api/sessions",
+                                "api/sessions/**",
+                                "/h2-console",
+                                "/h2-console/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
